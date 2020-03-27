@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Image, Text, Linking } from 'react-native';
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { Feather } from '@expo/vector-icons';
 import * as MailComposer from 'expo-mail-composer';
 
@@ -10,10 +10,11 @@ import styles from './styles';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const Detail = () => {
-
     const navigation = useNavigation();
+    const route = useRoute();
 
-    const message = 'Olá APAD, estou entrando em contato pois gostaria de ajudar no caso "nome do caso" com o valor de 120 ';
+    const incident = route.params.incident;
+    const message = `Olá ${incident.name}, estou entrando em contato pois gostaria de ajudar no caso "${incident.title}" com o valor de ${Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(incident.value)} `;
 
     const navigateBack = () => {
         navigation.goBack();
@@ -21,14 +22,14 @@ const Detail = () => {
 
     const sendMail = () => {
         MailComposer.composeAsync({
-            subject: 'Heroi do caso: teste',
-            recipients: ['thiagoggth@gmail.com'],
+            subject: `Heroi do caso ${incident.title}`,
+            recipients: [incident.email],
             body: message,
         })
     }
 
     const sendWhatsapp = () => {
-        Linking.openURL(`whatsapp://send?phone=67998139791&text=${message}`)
+        Linking.openURL(`whatsapp://send?phone=${incident.whatsapp}&text=${message}`)
     }
     return (
         <View style={styles.container}>
@@ -42,13 +43,13 @@ const Detail = () => {
 
             <View style={styles.incident}>
                 <Text style={[styles.incidentProperty, { marginTop: 0 }]}>ONG: </Text>
-                <Text style={styles.incidentValue}>APAD </Text>
+                <Text style={styles.incidentValue}>{incident.name} de {incident.city}/{incident.uf} </Text>
 
                 <Text style={styles.incidentProperty}>CASO: </Text>
-                <Text style={styles.incidentValue}>caso 1 </Text>
+                <Text style={styles.incidentValue}>{incident.description} </Text>
 
                 <Text style={styles.incidentProperty}>VALOR: </Text>
-                <Text style={styles.incidentValue}>120 </Text>
+                <Text style={styles.incidentValue}>{incident.value} </Text>
             </View>
 
             <View style={styles.contactBox}>
